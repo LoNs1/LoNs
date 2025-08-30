@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>September .</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: rgba(42, 42, 42, 0.3);
+            --bg-card: rgba(51, 51, 51, 0.2);
+            --bg-hover: rgba(64, 64, 64, 0.3);
+            
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            
+            --border-primary: rgba(68, 68, 68, 0.2);
+            --border-hover: rgba(102, 102, 102, 0.4);
+            
+            --shadow: rgba(0, 0, 0, 0.3);
+            --shadow-hover: rgba(0, 0, 0, 0.5);
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Background */
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        .background-media {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+        }
+        
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: rgba(26, 26, 26, 0.5);
+        }
+        
+        /* Audio Control */
+        .audio-toggle {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            background: rgba(51, 51, 51, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .audio-toggle:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+        }
+        
+        .audio-toggle.muted {
+            opacity: 0.4;
+        }
+        
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            top: 20px;
+            right: 50%;
+            transform: translateX(50%);
+            z-index: 1000;
+            background: rgba(51, 51, 51, 0.3);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 10px;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-item {
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-item:hover {
+            background: var(--bg-hover);
+        }
+        
+        .nav-item.active {
+            background: rgba(42, 42, 42, 0.4);
+            color: var(--text-primary);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 30px 50px;
+        }
+        
+        /* Page Sections */
+        .page-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        
+        .page-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        
+        .hero .welcome {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+        
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .card {
+            background: rgba(51, 51, 51, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-hover);
+        }
+        
+        .card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        /* Server Cards */
+        .servers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .server-card {
+            background: rgba(51, 51, 51, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-primary);
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .server-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--shadow-hover);
+            background: var(--bg-hover);
+        }
+        
+        .server-banner {
+            width: 100%;
+            height: 150px;
+            background: rgba(42, 42, 42, 0.3);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--border-primary);
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .server-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .server-info p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .server-btn {
+            background: rgba(42, 42, 42, 0.3);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--border-primary);
+            padding: 12px 25px;
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+        
+        .server-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            border-top: 1px solid var(--border-primary);
+            color: var(--text-muted);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                right: 15px;
+                left: 15px;
+                transform: none;
+            }
+            
+            .nav-menu {
+                gap: 5px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-item {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 120px 20px 40px;
+            }
+            
+            .audio-toggle {
+                bottom: 20px;
+                left: 20px;
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background -->
+    <div class="background-container">
+        <video id="backgroundVideo" class="background-media" autoplay muted loop>
+            <source src="2.mp4" type="video/mp4">
+            <source src="background-video.webm" type="video/webm">
+            <!-- Fallback image if video doesn't load -->
+            <img src="background.jpg" alt="Background">
+        </video>
+    </div>
+    <div class="background-overlay"></div>
+
+    <!-- Audio Toggle -->
+    <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()">🔊</button>
+    <audio id="backgroundAudio" loop autoplay>
+        <source src="2.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <ul class="nav-menu">
+            <li class="nav-item active" data-section="home">Home</li>
+            <li class="nav-item" data-section="servers">My Servers</li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Home -->
+        <div id="home" class="page-section active">
+            <div class="hero">
+                <h1>September</h1>
+                <p>Html Designer & Basic Devolper</p>
+                <p class="welcome">Welcome to My WebSite </p>
+            </div>
+
+            <div class="cards-grid">
+                <div class="card" onclick="window.open('https://discord.com/user/485529993372368899', '_blank')">
+                    <h3>Discord Account </h3>
+
+                </div>
+                
+                <div class="card" onclick="window.open('https://instagram.com/4__0, '_blank')">
+                    <h3>Instagram Account</h3>
+
+                </div>
+                
+                <div class="card" onclick="window.open('https://www.tiktok.com/@MS4wLjABAAAAOBeJ1OyuC0ZReW8YuS_t7Tlqtu3MJEx6QdUlmi8Q_YpSjzug1wijUoDqD3x3Oa1B?_t=ZS-8zGwVl934lz&_r=1', '_blank')">
+                    <h3>TikTok Account</h3>
+                </div>
+                
+                <div class="card" onclick="window.open('https://x.com/empttyhere', '_blank')">
+                    <h3>X Account</h3>
+
+                </div>
+                
+                <div class="card" onclick="window.open('#', '_blank')">
+                    <h3>Second Site</h3>
+                    <p>Soon Not Now</p>
+                </div>
+                
+                <div class="card" onclick="window.open('#', '_blank')">
+                    <h3>Empty Button</h3>
+                    <p></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Servers -->
+        <div id="servers" class="page-section">
+            <div class="hero">
+                <h1>My Servers</h1>
+                <p></p>
+            </div>
+
+            <div class="servers-grid">
+<div class="server-card">
+    <div class="server-banner" style="background-image: url('');">
+        We Hope You Enjoy With us 
+    </div>
+    <div class="server-info">
+        <h3>AlShehri Sever </h3>
+        <p>My Basic Server , for chatting and enjoying .</p>
+        <button class="server-btn" onclick="window.open('https://discord.gg/507', '_blank')">Join Server</button>
+    </div>
+</div>
+
+<div class="server-card">
+    <div class="server-banner" style="background-image: url('');">
+        We Hope You Like It 
+    </div>
+    <div class="server-info">
+        <h3>Cloud | سَحاب </h3>
+        <p>My Basic Store , For everything you want .</p>
+        <button class="server-btn" onclick="window.open('https://discord.gg/r4z45Q4AgW', '_blank')">Join Server</button>
+    </div>
+</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>September Love you .</p>
+        </div>
+    </div>
+
+    <script>
+        // Audio functionality
+        let isMuted = false;
+        
+        function toggleAudio() {
+            const audio = document.getElementById('backgroundAudio');
+            const toggle = document.getElementById('audioToggle');
+            
+            if (isMuted) {
+                audio.muted = false;
+                toggle.textContent = '🔊';
+                toggle.classList.remove('muted');
+                isMuted = false;
+            } else {
+                audio.muted = true;
+                toggle.textContent = '🔇';
+                toggle.classList.add('muted');
+                isMuted = true;
+            }
+        }
+
+        // Navigation with animation
+        function showSection(sectionName) {
+            const sections = document.querySelectorAll('.page-section');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            // Add fade-out animation to current active section
+            const activeSection = document.querySelector('.page-section.active');
+            if (activeSection) {
+                activeSection.style.opacity = 0;
+                activeSection.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                    });
+                    
+                    navItems.forEach(item => {
+                        item.classList.remove('active');
+                        if (item.getAttribute('data-section') === sectionName) {
+                            item.classList.add('active');
+                        }
+                    });
+                    
+                    // Add active class to new section after animation completes
+                    const newSection = document.getElementById(sectionName);
+                    newSection.classList.add('active');
+                    
+                    // Trigger reflow to restart animation
+                    void newSection.offsetWidth;
+                    
+                    // Add fade-in animation
+                    newSection.style.opacity = 1;
+                    newSection.style.transform = 'translateY(0)';
+                }, 300);
+            }
+        }
+
+        // Server functionality
+        function joinServer(serverId) {
+            if (serverId === 'server1') {
+                window.open('#', '_blank');
+            } else if (serverId === 'server2') {
+                window.open('#', '_blank');
+            }
+        }
+
+        // Initialize navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const sectionName = this.getAttribute('data-section');
+                    showSection(sectionName);
+                });
+            });
+            
+            // Handle audio autoplay restrictions
+            const audio = document.getElementById('backgroundAudio');
+            audio.volume = 0.5;
+            
+            document.body.addEventListener('click', function() {
+                if (audio.paused) {
+                    audio.play().catch(e => {
+                        console.log('Audio autoplay prevented');
+                    });
+                }
+            }, { once: true });
+        });
+    </script>
+</body>
+</html>
